@@ -1,9 +1,9 @@
 /* @refresh reload */
 import {render} from 'solid-js/web'
 import {Route, Router} from "@solidjs/router";
-import App from "./App.tsx";
+import App from "./app.tsx";
 import "./index.css";
-import Chat from "./pages/Chat.tsx";
+import Chat from "./pages/chat.tsx";
 import Layout from "./layout/layout.js";
 
 

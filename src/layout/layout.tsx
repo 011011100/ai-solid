@@ -8,15 +8,22 @@ type LayoutProps = {
 
 function layout({ children }: LayoutProps) {
     return(
-        <div>
-            <Header/>
-            <div class='flex items-center justify-center'>
-                <Sidebar/>
-                {children}
+        <div class="flex w-full flex-col">
+            <div class="card rounded-box shadow-sm h-20 place-items-center">
+                <Header/>
             </div>
-            {/*<Footer/>*/}
+            <div class="card rounded-box place-items-center">
+                <div class="flex w-full">
+                    <div class="card rounded-box max-w-min shadow-sm grow place-items-center">
+                        <Sidebar/>
+                    </div>
+                    <div class="card w-full rounded-box shadow-sm grow place-items-center">
+                        {children}
+                    </div>
+                </div>
+            </div>
         </div>
-    )
+)
 }
 
 export default layout

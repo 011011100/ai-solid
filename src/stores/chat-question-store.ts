@@ -1,9 +1,10 @@
 import {createSignal, onCleanup} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
+import {useMessagesStore} from "./chat-message-store.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
-function createChatQuestionStore(){
+function createChatQuestionStore() {
     const [question, setQuestion] = createSignal<string>('');
 
     function addQuestion(item: string) {
@@ -40,7 +41,11 @@ function createChatQuestionStore(){
     // 回答列
     const [answer, setAnswer] = createSignal<string>("");
 
-    function askQuestion(){
+    const {addMessage, updateMessage, messages} = useMessagesStore()
+
+    function askQuestion() {
+        addMessage({type: 'ask', message: question()})
+
         let lastUpdate = Date.now();
         setInside(true)
 
@@ -49,7 +54,9 @@ function createChatQuestionStore(){
         const es = new EventSource(`http://localhost:8080/ai2?question=${question()}`);
 
         removeQuestion()
-
+        setAnswer("");
+        setThinkMessages("");
+        const index = messages.length
         es.onmessage = (e) => {
             lastUpdate = Date.now();
             let data: ResponseParser = new ResponseParser(JSON.parse(e.data));
@@ -64,6 +71,7 @@ function createChatQuestionStore(){
                 setThinkMessages(str => str + text);
             } else {
                 setAnswer(str => str + text);
+                updateMessage(index, {type: 'answer', message: answer()})
             }
             setInside(inside)
 
@@ -90,7 +98,7 @@ function createChatQuestionStore(){
         onCleanup(() => es.close());
     }
 
-    return{
+    return {
         question,
         addQuestion,
         removeQuestion,

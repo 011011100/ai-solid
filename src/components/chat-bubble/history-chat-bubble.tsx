@@ -1,18 +1,21 @@
-import askBubble from "./ask-bubble.js";
-import answerBubble from "./answer-bubble.js";
-import type {ChatBubble} from "../../type/chat-bubble.js";
+import {useMessagesStore} from "../../stores/chat-message-store.js";
+import AnswerBubble from "./answer-bubble.js";
+import AskBubble from "./ask-bubble.js";
+import type {Component} from "solid-js";
 
-
-export default function historyChatBubble(props: ChatBubble[]) {
+const HistoryChatBubble: Component = () => {
+    const {messages} = useMessagesStore();
     return (
         <>
-            {props.map( prop => {
+            {messages.map(msg => {
                 return (
-                    prop.type === 'ask' ?
-                        askBubble(prop.message) :
-                        answerBubble(prop.message)
+                    msg.type === 'ask' ?
+                        <AskBubble message={msg.message}/> :
+                        <AnswerBubble message={msg.message}/>
                 )
             })}
         </>
     )
 }
+
+export default HistoryChatBubble

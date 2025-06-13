@@ -1,16 +1,28 @@
 import MarkdownIt from "markdown-it";
+import type {Component} from "solid-js";
 
-const md = new MarkdownIt();
+const md = MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true,
+});
 
-export default function answerBubble(message: string) {
+type AnswerBubbleProps = {
+    message: string;
+};
+
+const AnswerBubble: Component<AnswerBubbleProps> = (props) => {
+    const html = () => md.render(props.message);
     return (
-        <div class="chat chat-end">
+        <div class="chat chat-start">
             <div class="chat-bubble">
                 <div
                     class="markdown-body"
-                    innerHTML={md.render(message)}
+                    innerHTML={html()}
                 />
             </div>
         </div>
-    )
-}
+    );
+};
+
+export default AnswerBubble;

@@ -5,8 +5,8 @@ const {question, addQuestion, askQuestion, inside} = useChatQuestionStore();
 
 const QuestionBox: Component = () => {
     return (
-        <div class='w-full flexitems-center flex flex-col shadow-sm p-2 rounded-md'>
-            <textarea class="text-lg textarea textarea-ghost w-2xl min-h-min resize-none focus:outline-hidden p-1"
+        <div class='w-full flexitems-center flex flex-col shadow-sm p-2 rounded-md m-4 bg-white border-1 border-[#e5e5e5] border-solid'>
+            <textarea class="text-lg textarea textarea-ghost w-4xl min-h-min resize-none focus:outline-hidden p-1"
                       rows={1}
                       placeholder="询问任何问题"
                       value={question()}

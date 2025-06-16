@@ -3,6 +3,7 @@ import type {Component} from "solid-js";
 import hljs from "highlight.js";
 import 'highlight.js/styles/atom-one-light.css';
 import type MarkdownIt from "markdown-it/index.js"; // 也可以用 'atom-one-dark.css' 等
+import './markdown-body.css'
 
 const md:MarkdownIt = markdownIt({
     html: true,
@@ -26,11 +27,10 @@ type AnswerBubbleProps = {
 
 const AnswerBubble: Component<AnswerBubbleProps> = (props) => {
     const html = () => md.render(props.message);
-    console.log(html())
     return (
         <div class="card p-4 mb-2 mt-4">
             <div
-                class="markdown-body prose prose-base leading-loose"
+                class="markdown-body prose prose-base"
                 innerHTML={html()}
             />
         </div>

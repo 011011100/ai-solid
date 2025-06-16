@@ -1,0 +1,17 @@
+.markdown-body{
+
+
+
+    p {
+        margin: .5rem 0;
+    }
+    li {
+        margin: .5rem 0;
+    }
+    hr {
+        margin: 2rem 0;
+    }
+    pre {
+       margin-top: 1rem;
+    }
+}

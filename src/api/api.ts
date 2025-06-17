@@ -9,7 +9,12 @@ const getHistoryMessageApi = ((conversationId: string): string => {
     return `${BASE_URL}getHistoryMessage?conversationId=${conversationId}`;
 })
 
+const getHistoryConversationIdApi = (): string => {
+    return `${BASE_URL}getHistoryConversationId`;
+}
+
 export {
     askQuestionApi,
     getHistoryMessageApi,
+    getHistoryConversationIdApi
 };

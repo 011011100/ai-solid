@@ -1,6 +1,8 @@
-import {createSignal, onCleanup} from "solid-js";
+import {createEffect, createSignal} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
 import {useMessagesStore} from "./chat-message-store.js";
+import {useEventSource} from "../utils/use-event-source.js";
+import {askQuestionApi} from "../api/api.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -44,58 +46,45 @@ function createChatQuestionStore() {
     const {addMessage, updateMessage, messages} = useMessagesStore()
 
     function askQuestion() {
-        addMessage({type: 'ask', message: question()})
+        const q = question()
+        addMessage({type: 'ask', message: q})
+        removeQuestion();
 
-        let lastUpdate = Date.now();
+        setAnswer("");
+        setThinkMessages("");
         setInside(true)
+
+        const index = messages.length
 
         const detectThink = createThinkBlockDetector()
 
-        const es = new EventSource(`http://localhost:8080/ai2?question=${question()}`);
+        let {data, stop} = useEventSource<ResponseParser>(askQuestionApi(q, '002'));
 
-        removeQuestion()
-        setAnswer("");
-        setThinkMessages("");
-        const index = messages.length
-        es.onmessage = (e) => {
-            lastUpdate = Date.now();
-            let data: ResponseParser = new ResponseParser(JSON.parse(e.data));
-            let text = data.getText();
-            const inside = detectThink(text)
-            if (isStart.test(text) || isEnd.test(text)) {
-                text = ''
+        createEffect(() => {
+            const d = data();
+            if (d) {
+                // 这里的逻辑会在 data() 每次变化时执行
+                let res: ResponseParser = new ResponseParser(d);
+                let text = res.getText();
+                const inside = detectThink(text)
+                if (isStart.test(text) || isEnd.test(text)) {
+                    text = ''
+                }
+
+                setMessagesArray(prev => [...prev, text]);
+                if (inside) {
+                    setThinkMessages(str => str + text);
+                } else {
+                    setAnswer(str => str + text);
+                    updateMessage(index, {type: 'answer', message: answer()})
+                }
+                setInside(inside)
+
+                if (res.result.metadata.finishReason === 'stop') {
+                    stop();
+                }
             }
-
-            setMessagesArray(prev => [...prev, e.data]);
-            if (inside) {
-                setThinkMessages(str => str + text);
-            } else {
-                setAnswer(str => str + text);
-                updateMessage(index, {type: 'answer', message: answer()})
-            }
-            setInside(inside)
-
-            if (data.result.metadata.finishReason === 'stop') {
-                es.close();
-                // 停止心跳
-                clearInterval(heartbeat);
-            }
-        };
-
-        es.onerror = () => {
-            es.close(); /* 可做重连处理 */
-        };
-
-        const heartbeat = setInterval(() => {
-            const now = Date.now();
-            if (now - lastUpdate > 10_000) { // 超过10秒未收到数据
-                console.warn("检测到流可能已停止");
-                es.close();
-                clearInterval(heartbeat);
-            }
-        }, 1000);
-
-        onCleanup(() => es.close());
+        });
     }
 
     return {

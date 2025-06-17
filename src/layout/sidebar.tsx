@@ -14,18 +14,38 @@ const sidebar: Component = () => {
         }
     })
 
-    function getHistoryMessage (conversationId: string): void {
-        const {removeAllMessage,getMessage} = useMessagesStore()
+    const {removeAllMessage, getMessage} = useMessagesStore()
+
+    function getHistoryMessage(conversationId: string): void {
         removeAllMessage()
         getMessage(conversationId);
     }
 
+    function newQuestion() {
+        removeAllMessage()
+    }
+
     return (
-        <ul class="menu bg-base-200 rounded-box w-56">
-            {conversationIdList().map((text:string) =>{
-                return<li onClick={() => getHistoryMessage(text)}><a>{text}</a></li>
-            })}
-        </ul>
+        <>
+            <ul class="menu bg-base-200 rounded-box w-56">
+                <li onClick={() => newQuestion()}>
+                    <a class='flex items-center'>
+                        <IconMdiFileDocumentPlusOutline class="w-4 h-4"/>
+                        <p class='text-base'>新问题</p>
+                    </a>
+                </li>
+            </ul>
+            <ul class="menu bg-base-200 rounded-box w-56">
+                <li class='menu-title'>聊天</li>
+                {conversationIdList().map((text: string) => {
+                    return <li class='text-base' onClick={() => getHistoryMessage(text)}>
+                        <a>
+                            {text}
+                        </a>
+                    </li>
+                })}
+            </ul>
+        </>
     )
 }
 

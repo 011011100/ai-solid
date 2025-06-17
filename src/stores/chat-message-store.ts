@@ -47,12 +47,17 @@ function createMessagesStore() {
         setMessages(prev => prev.filter((_, i) => i !== index));
     }
 
+    function removeAllMessage(){
+        setMessages([]);
+    }
+
     return {
         messages,
         getMessage,
         addMessage,
         updateMessage,
-        removeMessage
+        removeMessage,
+        removeAllMessage,
     };
 }
 

@@ -1,16 +1,17 @@
 import {type Component, createEffect, createSignal} from "solid-js";
-import {getHistoryConversationIdApi} from "../api/api.js";
+import {getHistoryConversationApi} from "../api/api.js";
 import {useEventSource} from "../utils/use-event-source.js";
 import {useMessagesStore} from "../stores/chat-message-store.js";
+import  HistoryConversation from "../type/history-conversation.js";
 
 const sidebar: Component = () => {
-    const {data} = useEventSource<Array<string>>(getHistoryConversationIdApi());
+    const {data} = useEventSource<Array<HistoryConversation>>(getHistoryConversationApi());
 
-    const [conversationIdList, setConversationId] = createSignal<Array<string>>([]);
+    const [historyConversation, setHistoryConversation] = createSignal<Array<HistoryConversation>>([]);
     createEffect(() => {
         let d = data()
         if (d) {
-            setConversationId([...d])
+            setHistoryConversation([...d])
         }
     })
 
@@ -37,10 +38,10 @@ const sidebar: Component = () => {
             </ul>
             <ul class="menu bg-base-200 rounded-box w-56">
                 <li class='menu-title'>聊天</li>
-                {conversationIdList().map((text: string) => {
-                    return <li class='text-base' onClick={() => getHistoryMessage(text)}>
+                {historyConversation().map((data: HistoryConversation) => {
+                    return <li class='text-base' onClick={() => getHistoryMessage(data.conversationId)}>
                         <a>
-                            {text}
+                            {data.problemSummary}
                         </a>
                     </li>
                 })}

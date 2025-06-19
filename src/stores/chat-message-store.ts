@@ -29,7 +29,6 @@ function createMessagesStore() {
                     default:
                         break;
                 }
-                console.log(data())
             }
         })
         return messages;

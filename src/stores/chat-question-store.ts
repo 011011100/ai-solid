@@ -2,7 +2,8 @@ import {createEffect, createSignal} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
 import {useMessagesStore} from "./chat-message-store.js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {askQuestionApi} from "../api/api.js";
+import {askQuestionApi, createTitleApi} from "../api/api.js";
+import {useChatConversationStore} from "./chat-conversation-store.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -45,6 +46,10 @@ function createChatQuestionStore() {
 
     const {addMessage, updateMessage, messages} = useMessagesStore()
 
+    const [conversationId, setConversationId] = createSignal<string>(crypto.randomUUID().replace("-", ""));
+
+    const [isNewQuestion, setIsNewQuestion] = createSignal<boolean>(true);
+
     function askQuestion() {
         const q = question()
         addMessage({type: 'ask', message: q})
@@ -54,17 +59,34 @@ function createChatQuestionStore() {
         setThinkMessages("");
         setInside(true)
 
+        if (isNewQuestion()) {
+            let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId()), {
+                connectTimeout: -1,
+                idleTimeout: -1
+            });
+            createEffect(() => {
+                const titleD = titleData();
+                if (titleD) {
+                    const conversationStore = useChatConversationStore()
+                    conversationStore.addConversation({
+                        conversationId: conversationId(),
+                        problemSummary: titleD
+                    })
+                }
+            })
+        }
+
         const index = messages.length
 
         const detectThink = createThinkBlockDetector()
 
-        let {data, stop} = useEventSource<ResponseParser>(askQuestionApi(q, '002'));
+        let {data: aksData, stop: askStop} = useEventSource<ResponseParser>(askQuestionApi(q, conversationId()));
 
         createEffect(() => {
-            const d = data();
-            if (d) {
+            const askD = aksData();
+            if (askD) {
                 // 这里的逻辑会在 data() 每次变化时执行
-                let res: ResponseParser = new ResponseParser(d);
+                let res: ResponseParser = new ResponseParser(askD);
                 let text = res.getText();
                 const inside = detectThink(text)
                 if (isStart.test(text) || isEnd.test(text)) {
@@ -81,9 +103,11 @@ function createChatQuestionStore() {
                 setInside(inside)
 
                 if (res.result.metadata.finishReason === 'stop') {
-                    stop();
+                    askStop();
                 }
             }
+
+
         });
     }
 
@@ -96,6 +120,9 @@ function createChatQuestionStore() {
         messagesArray,
         thinkMessages,
         answer,
+        conversationId,
+        setConversationId,
+        setIsNewQuestion,
     }
 }
 

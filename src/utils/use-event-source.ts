@@ -1,16 +1,39 @@
 // src/utils/useEventSource.ts
 import { createSignal, onCleanup } from "solid-js";
 
-export function useEventSource<T = any>(url: string) {
+interface UseEventSourceOptions {
+    connectTimeout?: number; // 毫秒，连接建立最大等待时间，-1 表示禁用
+    idleTimeout?: number;    // 毫秒，连接建立后最大静默时间，-1 表示禁用
+}
+
+export function useEventSource<T = any>(url: string, options?: UseEventSourceOptions) {
     const [data, setData] = createSignal<T | null>(null);
     const [error, setError] = createSignal<Event | null>(null);
     const [isOpen, setIsOpen] = createSignal(false);
 
-    let lastUpdate = Date.now();
+    const connectTimeoutMs = options?.connectTimeout ?? 50000; // 默认连接超时 50s
+    const idleTimeoutMs = options?.idleTimeout ?? 10000; // 默认心跳超时 10s
 
+    let lastUpdate = Date.now();
     let eventSource: EventSource | null = new EventSource(url);
 
+    let heartbeat: number | undefined;
+    let connectTimeout: number | undefined;
+
+    if (connectTimeoutMs !== -1) {
+        connectTimeout = window.setTimeout(() => {
+            if (!isOpen()) {
+                console.warn("连接超时");
+                setError(new Event("timeout"));
+                eventSource?.close();
+                eventSource = null;
+                clearInterval(heartbeat);
+            }
+        }, connectTimeoutMs);
+    }
+
     eventSource.onopen = () => {
+        if (connectTimeout !== undefined) clearTimeout(connectTimeout);
         setIsOpen(true);
     };
 
@@ -26,27 +49,36 @@ export function useEventSource<T = any>(url: string) {
     eventSource.onerror = (e) => {
         setError(e);
         setIsOpen(false);
-        eventSource?.close(); // 可根据需求选择是否自动关闭
+        eventSource?.close();
         clearInterval(heartbeat);
+        if (connectTimeout !== undefined) clearTimeout(connectTimeout);
     };
 
-    const heartbeat = setInterval(() => {
-        const now = Date.now();
-        if (now - lastUpdate > 10_000) { // 超过10秒未收到数据
-            console.warn("检测到流可能已停止");
-            eventSource?.close();
-            clearInterval(heartbeat);
-        }
-    }, 1000);
+    if (idleTimeoutMs !== -1) {
+        heartbeat = window.setInterval(() => {
+            const now = Date.now();
+            if (now - lastUpdate > idleTimeoutMs) {
+                console.warn("检测到流可能已停止");
+                eventSource?.close();
+                eventSource = null;
+                clearInterval(heartbeat);
+                setIsOpen(false);
+            }
+        }, 1000);
+    }
 
     onCleanup(() => {
         eventSource?.close();
-        clearInterval(heartbeat);
+        eventSource = null;
+        if (heartbeat !== undefined) clearInterval(heartbeat);
+        if (connectTimeout !== undefined) clearTimeout(connectTimeout);
     });
 
     const stop = () => {
         eventSource?.close();
         eventSource = null;
+        if (heartbeat !== undefined) clearInterval(heartbeat);
+        if (connectTimeout !== undefined) clearTimeout(connectTimeout);
         setIsOpen(false);
     };
 

@@ -64,11 +64,17 @@ function createChatQuestionStore() {
                 connectTimeout: -1,
                 idleTimeout: -1
             });
+
+            const conversationStore = useChatConversationStore()
+            conversationStore.addConversation({
+                conversationId: conversationId(),
+                problemSummary: "新问题"
+            })
+
             createEffect(() => {
                 const titleD = titleData();
                 if (titleD) {
-                    const conversationStore = useChatConversationStore()
-                    conversationStore.addConversation({
+                    conversationStore.updateConversation({
                         conversationId: conversationId(),
                         problemSummary: titleD
                     })

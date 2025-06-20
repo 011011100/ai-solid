@@ -22,10 +22,15 @@ function createChatConversationStore() {
         setHistoryConversation(prev => [item,...prev]);
     }
 
+    function updateConversation(item: HistoryConversation) {
+        setHistoryConversation(prev => prev.map((conversation) => conversation.conversationId === item.conversationId ? item : conversation));
+    }
+
     return {
         historyConversation,
         getAllConversation,
         addConversation,
+        updateConversation,
     }
 }
 

@@ -10,16 +10,18 @@ const Chat = () => {
         <div class='w-100% min-w-4xl max-w-4xl max-h-[100%]'>
             {messagesStorm.messages.length == 0 && !chatStore.inside() ?
                 <div class='h-dvh flex justify-center items-center flex-col'>
-                    <p class={`absolute mb-40 text-center text-4xl pb-4 animate-in fade-in slide-in-from-top duration-300 text-[#353535ff] ${
-                        chatStore.question() ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"
-                    }`}>
-                        man😉 what can i say?
-                    </p>
-                    <p class={`absolute mb-40 text-center text-4xl pb-4 animate-in fade-in slide-in-from-bottom duration-300 text-[#353535ff] ${
-                        chatStore.question() ? "opacity-0 translate-x-full" : "opacity-100 translate-x-0"
-                    }`}>
-                        say my angel!😇 say for me!
-                    </p>
+                    <div>
+                        <p class={`text-center text-4xl pb-4 animate-in fade-in slide-in-from-top duration-300 text-[#353535ff] ${
+                            chatStore.question() ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"
+                        }`}>
+                            man😉 what can i say?
+                        </p>
+                        <p class={`text-center text-4xl pb-4 animate-in fade-in slide-in-from-bottom duration-300 text-[#353535ff] ${
+                            chatStore.question() ? "opacity-0 translate-x-full" : "opacity-100 translate-x-0"
+                        }`}>
+                            say my angel!😇 say for me!
+                        </p>
+                    </div>
                     <div>
                         <QuestionBox/>
                     </div>

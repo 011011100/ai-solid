@@ -1,5 +1,5 @@
 // src/utils/useEventSource.ts
-import { createSignal, onCleanup } from "solid-js";
+import {createRoot, createSignal, onCleanup} from "solid-js";
 
 interface UseEventSourceOptions {
     connectTimeout?: number; // 毫秒，连接建立最大等待时间，-1 表示禁用
@@ -67,12 +67,14 @@ export function useEventSource<T = any>(url: string, options?: UseEventSourceOpt
         }, 1000);
     }
 
-    onCleanup(() => {
-        eventSource?.close();
-        eventSource = null;
-        if (heartbeat !== undefined) clearInterval(heartbeat);
-        if (connectTimeout !== undefined) clearTimeout(connectTimeout);
-    });
+    createRoot(() => {
+        onCleanup(() => {
+            eventSource?.close();
+            eventSource = null;
+            if (heartbeat !== undefined) clearInterval(heartbeat);
+            if (connectTimeout !== undefined) clearTimeout(connectTimeout);
+        });
+    })
 
     const stop = () => {
         eventSource?.close();

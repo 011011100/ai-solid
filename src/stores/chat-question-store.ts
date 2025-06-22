@@ -1,4 +1,4 @@
-import {createEffect, createSignal} from "solid-js";
+import {createEffect, createRoot, createSignal} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
 import {useMessagesStore} from "./chat-message-store.js";
 import {useEventSource} from "../utils/use-event-source.js";
@@ -59,62 +59,65 @@ function createChatQuestionStore() {
         setThinkMessages("");
         setInside(true)
 
-        if (isNewQuestion()) {
-            let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId()), {
-                connectTimeout: -1,
-                idleTimeout: -1
-            });
+        createRoot(() => {
+            if (isNewQuestion()) {
+                let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId()), {
+                    connectTimeout: -1,
+                    idleTimeout: -1
+                });
 
-            const conversationStore = useChatConversationStore()
-            conversationStore.addConversation({
-                conversationId: conversationId(),
-                problemSummary: "新问题"
-            })
+                const conversationStore = useChatConversationStore()
+                conversationStore.addConversation({
+                    conversationId: conversationId(),
+                    problemSummary: "新问题"
+                })
 
-            createEffect(() => {
-                const titleD = titleData();
-                if (titleD) {
-                    conversationStore.updateConversation({
-                        conversationId: conversationId(),
-                        problemSummary: titleD
-                    })
-                }
-            })
-        }
-
-        const index = messages.length
-
-        const detectThink = createThinkBlockDetector()
-
-        let {data: aksData, stop: askStop} = useEventSource<ResponseParser>(askQuestionApi(q, conversationId()));
-
-        createEffect(() => {
-            const askD = aksData();
-            if (askD) {
-                // 这里的逻辑会在 data() 每次变化时执行
-                let res: ResponseParser = new ResponseParser(askD);
-                let text = res.getText();
-                const inside = detectThink(text)
-                if (isStart.test(text) || isEnd.test(text)) {
-                    text = ''
-                }
-
-                setMessagesArray(prev => [...prev, text]);
-                if (inside) {
-                    setThinkMessages(str => str + text);
-                } else {
-                    setAnswer(str => str + text);
-                    updateMessage(index, {type: 'answer', message: answer()})
-                }
-                setInside(inside)
-
-                if (res.result.metadata.finishReason === 'stop') {
-                    askStop();
-                }
+                createEffect(() => {
+                    const titleD = titleData();
+                    if (titleD) {
+                        conversationStore.updateConversation({
+                            conversationId: conversationId(),
+                            problemSummary: titleD
+                        })
+                    }
+                })
             }
 
+            const index = messages.length
 
-        });
+            const detectThink = createThinkBlockDetector()
+
+            let {
+                data: aksData,
+                stop: askStop
+            } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId()));
+
+            createEffect(() => {
+                const askD = aksData();
+                if (askD) {
+                    // 这里的逻辑会在 data() 每次变化时执行
+                    let res: ResponseParser = new ResponseParser(askD);
+                    let text = res.getText();
+                    const inside = detectThink(text)
+                    if (isStart.test(text) || isEnd.test(text)) {
+                        text = ''
+                    }
+
+                    setMessagesArray(prev => [...prev, text]);
+                    if (inside) {
+                        setThinkMessages(str => str + text);
+                    } else {
+                        setAnswer(str => str + text);
+                        updateMessage(index, {type: 'answer', message: answer()})
+                    }
+                    setInside(inside)
+
+                    if (res.result.metadata.finishReason === 'stop') {
+                        askStop();
+                    }
+                }
+            });
+        })
     }
 
     return {

@@ -2,8 +2,10 @@ import {createEffect, createRoot, createSignal} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
 import {useMessagesStore} from "./chat-message-store.js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {askQuestionApi, createTitleApi} from "../api/api.js";
+import {askQuestionApi, createTitleApi} from "../api/ollama-api.js";
 import {useChatConversationStore} from "./chat-conversation-store.js";
+import {useChatModelStore} from "./chat-model-store.js";
+import {notify} from "../components/notification-context/global-notifier.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -44,7 +46,7 @@ function createChatQuestionStore() {
     // 回答列
     const [answer, setAnswer] = createSignal<string>("");
 
-    const {addMessage, updateMessage, messages} = useMessagesStore()
+    const messagesStore = useMessagesStore()
 
     const [conversationId, setConversationId] = createSignal<string>(crypto.randomUUID().replace("-", ""));
 
@@ -52,16 +54,23 @@ function createChatQuestionStore() {
 
     function askQuestion() {
         const q = question()
-        addMessage({type: 'ask', message: q})
-        removeQuestion();
 
+        const chatModelStore = useChatModelStore()
+        if (!chatModelStore.model()){
+            notify("请选择模型","error")
+            return;
+        }
+
+        messagesStore.addMessage({type: 'ask', message: q})
+
+        removeQuestion();
         setAnswer("");
         setThinkMessages("");
-        setInside(true)
 
+        setInside(true)
         createRoot(() => {
             if (isNewQuestion()) {
-                let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId()), {
+                let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId(),chatModelStore.model()), {
                     connectTimeout: -1,
                     idleTimeout: -1
                 });
@@ -81,16 +90,18 @@ function createChatQuestionStore() {
                         })
                     }
                 })
+
+                setIsNewQuestion(false);
             }
 
-            const index = messages.length
+            const index = messagesStore.messages.length
 
             const detectThink = createThinkBlockDetector()
 
             let {
                 data: aksData,
                 stop: askStop
-            } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId()));
+            } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(),chatModelStore.model()));
 
             createEffect(() => {
                 const askD = aksData();
@@ -108,7 +119,7 @@ function createChatQuestionStore() {
                         setThinkMessages(str => str + text);
                     } else {
                         setAnswer(str => str + text);
-                        updateMessage(index, {type: 'answer', message: answer()})
+                        messagesStore.updateMessage(index, {type: 'answer', message: answer()})
                     }
                     setInside(inside)
 

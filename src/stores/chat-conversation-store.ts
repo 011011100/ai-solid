@@ -1,7 +1,7 @@
 import {createEffect, createSignal} from "solid-js";
 import HistoryConversation from "../type/history-conversation.js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {getHistoryConversationApi} from "../api/api.js";
+import {getHistoryConversationApi} from "../api/ollama-api.js";
 
 let store: ReturnType<typeof createChatConversationStore>;
 

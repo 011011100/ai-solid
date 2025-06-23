@@ -1,6 +1,6 @@
 import {createStore} from 'solid-js/store';
 import type {ChatBubble} from "../type/chat-bubble.js";
-import {getHistoryMessageApi} from "../api/api.js";
+import {getHistoryMessageApi} from "../api/ollama-api.js";
 import {useEventSource} from "../utils/use-event-source.js";
 import {createEffect, createRoot} from "solid-js";
 import chatMessage from "../type/chat-message.js";

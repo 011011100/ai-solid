@@ -1,13 +1,10 @@
 import {BASE_URL} from "../config/config.js";
 
-export const deepseekApi =  () => {
+const getAllDeepSeekChatModel = (() => {
+    return `${BASE_URL}getAllDeepSeekChatModel`;
+})
 
-    const getAllChatModel = (() => {
-        return `${BASE_URL}getAllDeepSeekChatModel`;
-    })
-
-    return {
-        getAllChatModel,
-    }
+export {
+    getAllDeepSeekChatModel,
 }
 

@@ -1,7 +1,7 @@
 import {createEffect, createSignal} from "solid-js";
 import HistoryConversation from "../type/history-conversation.js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {defaultChatApi} from "../api/default-chat-api.js";
+import {getHistoryConversationApi} from "../api/default-chat-api.js";
 
 let store: ReturnType<typeof createChatConversationStore>;
 
@@ -9,7 +9,7 @@ function createChatConversationStore() {
     const [historyConversation, setHistoryConversation] = createSignal<Array<HistoryConversation>>([]);
 
     function getAllConversation() {
-        const {data} = useEventSource<Array<HistoryConversation>>(defaultChatApi().getHistoryConversationApi());
+        const {data} = useEventSource<Array<HistoryConversation>>(getHistoryConversationApi());
         createEffect(() =>{
             let d = data()
             if (d) {

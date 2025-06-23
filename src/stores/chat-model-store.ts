@@ -1,8 +1,8 @@
 import {createEffect, createRoot, createSignal} from "solid-js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {ollamaApi} from "../api/ollama-api.js";
+import {getAllOllamaChatModel} from "../api/ollama-api.js";
 import {type OllamaChatModelTag, OllamaChatModelTagsResponse} from "../type/ollama-chat-model-tag.js";
-// import {deepseekApi} from "../api/deepseek-api.js";
+// import {getAllDeepSeekChatModel} from "../api/deepseek-api.js";
 // import {DeepseekChatModelTag, type DeepseekChatModelTagsResponse} from "../type/deepseek-chat-model-tag.js";
 
 let store: ReturnType<typeof createChatModelStore>;
@@ -14,8 +14,8 @@ function createChatModelStore() {
 
     function getAllModelName() {
         setModelNameList([]);
-        let {data} = useEventSource<OllamaChatModelTagsResponse>(ollamaApi().getAllChatModel())
-        // let {data} = useEventSource<DeepseekChatModelTagsResponse>(deepseekApi().getAllChatModel())
+        let {data} = useEventSource<OllamaChatModelTagsResponse>(getAllOllamaChatModel())
+        // let {data} = useEventSource<DeepseekChatModelTagsResponse>(getAllDeepSeekChatModel)
         createRoot(() => {
             createEffect(() => {
                 // let d = data()?.data;

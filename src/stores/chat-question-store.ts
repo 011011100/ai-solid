@@ -5,7 +5,7 @@ import {useEventSource} from "../utils/use-event-source.js";
 import {useChatConversationStore} from "./chat-conversation-store.js";
 import {useChatModelStore} from "./chat-model-store.js";
 import {notify} from "../components/notification-context/global-notifier.js";
-import {defaultChatApi} from "../api/default-chat-api.js";
+import {askQuestionApi, createTitleApi} from "../api/default-chat-api.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -70,7 +70,7 @@ function createChatQuestionStore() {
         setInside(true)
         createRoot(() => {
             if (isNewQuestion()) {
-                let {data: titleData} = useEventSource<string>(defaultChatApi().createTitleApi(q, conversationId(),chatModelStore.model()), {
+                let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId(),chatModelStore.model()), {
                     connectTimeout: -1,
                     idleTimeout: -1
                 });
@@ -101,7 +101,7 @@ function createChatQuestionStore() {
             let {
                 data: aksData,
                 stop: askStop
-            } = useEventSource<ResponseParser>(defaultChatApi().askQuestionApi(q, conversationId(),chatModelStore.model()));
+            } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(),chatModelStore.model()));
 
             createEffect(() => {
                 const askD = aksData();

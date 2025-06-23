@@ -4,7 +4,7 @@ import {useEventSource} from "../utils/use-event-source.js";
 import {createEffect, createRoot} from "solid-js";
 import chatMessage from "../type/chat-message.js";
 import ChatMessage from "../type/chat-message.js";
-import {defaultChatApi} from "../api/default-chat-api.js";
+import {getHistoryMessageApi} from "../api/default-chat-api.js";
 
 let store: ReturnType<typeof createMessagesStore>;
 
@@ -12,7 +12,7 @@ function createMessagesStore() {
     const [messages, setMessages] = createStore<ChatBubble[]>([]);
 
     function getMessage(conversationId: string) {
-        const {data} = useEventSource<chatMessage>(defaultChatApi().getHistoryMessageApi(conversationId));
+        const {data} = useEventSource<chatMessage>(getHistoryMessageApi(conversationId));
         createRoot(() => {
             createEffect(() => {
                 const d = data();

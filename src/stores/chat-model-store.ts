@@ -8,8 +8,8 @@ import {type OllamaChatModelTag, OllamaChatModelTagsResponse} from "../type/olla
 let store: ReturnType<typeof createChatModelStore>;
 
 function createChatModelStore() {
-    const [modelNameList, setModelNameList] = createSignal<string[]>([]);
-    const [modelList, setModelList] = createSignal<OllamaChatModelTag[]>([]);
+    const [modelNameList, setModelNameList] = createSignal<string[]>();
+    const [modelList, setModelList] = createSignal<OllamaChatModelTag[]>();
     // const [modelList, setModelList] = createSignal<DeepseekChatModelTag[]>([]);
 
     function getAllModelName() {

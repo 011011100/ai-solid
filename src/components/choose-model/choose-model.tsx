@@ -13,20 +13,22 @@ const chooseModel: Component = () => {
         <div class="dropdown dropdown-end z-10">
             <p class="label mr-1">选择模型</p>
             <div tabIndex={0} role="button" class="m-1 text-lg ">
-                {chatModelStore.model() || "选择模型"}
+                {chatModelStore.model() || chatModelStore.modelNameList()?.length !== 0 ? "选择模型" : "什么都没有"}
             </div>
-            <ul tabIndex={0}
-                class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                {
-                    chatModelStore.modelNameList().map(name => {
+            {chatModelStore.modelNameList()?.length !== 0 ?
+                <ul tabIndex={0}
+                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                    {chatModelStore.modelNameList()!.map(name => {
                         return <li>
                             <a onClick={() => chatModelStore.setModelName(name)}>
                                 {name}
                             </a>
                         </li>
                     })
-                }
-            </ul>
+                    }
+                </ul> :
+                null
+            }
         </div>
     )
 }

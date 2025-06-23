@@ -1,12 +1,13 @@
 import {BASE_URL} from "../config/config.js";
 
-export const ollamaApi = () => {
+export const deepseekApi =  () => {
 
     const getAllChatModel = (() => {
-        return `${BASE_URL}getAllOllamaChatModel`;
+        return `${BASE_URL}getAllDeepSeekChatModel`;
     })
 
     return {
         getAllChatModel,
     }
 }
+

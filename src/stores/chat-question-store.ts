@@ -1,4 +1,4 @@
-import {createEffect, createRoot, createSignal} from "solid-js";
+import {createSignal} from "solid-js";
 import {ResponseParser} from "../type/response-parser.js";
 import {useMessagesStore} from "./chat-message-store.js";
 import {useEventSource} from "../utils/use-event-source.js";
@@ -56,8 +56,8 @@ function createChatQuestionStore() {
         const q = question()
 
         const chatModelStore = useChatModelStore()
-        if (!chatModelStore.model()){
-            notify("请选择模型","error")
+        if (!chatModelStore.model()) {
+            notify("请选择模型", "error")
             return;
         }
 
@@ -68,67 +68,58 @@ function createChatQuestionStore() {
         setThinkMessages("");
 
         setInside(true)
-        createRoot(() => {
-            if (isNewQuestion()) {
-                let {data: titleData} = useEventSource<string>(createTitleApi(q, conversationId(),chatModelStore.model()), {
-                    connectTimeout: -1,
-                    idleTimeout: -1
-                });
+        if (isNewQuestion()) {
+            const conversationStore = useChatConversationStore()
+            conversationStore.addConversation({
+                conversationId: conversationId(),
+                problemSummary: "新问题"
+            })
 
-                const conversationStore = useChatConversationStore()
-                conversationStore.addConversation({
-                    conversationId: conversationId(),
-                    problemSummary: "新问题"
-                })
+            useEventSource<string>(createTitleApi(q, conversationId(), chatModelStore.model()), {
+                connectTimeout: -1,
+                idleTimeout: -1,
+                onMessage: (data) => {
 
-                createEffect(() => {
-                    const titleD = titleData();
-                    if (titleD) {
-                        conversationStore.updateConversation({
-                            conversationId: conversationId(),
-                            problemSummary: titleD
-                        })
-                    }
-                })
-
-                setIsNewQuestion(false);
-            }
-
-            const index = messagesStore.messages.length
-
-            const detectThink = createThinkBlockDetector()
-
-            let {
-                data: aksData,
-                stop: askStop
-            } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(),chatModelStore.model()));
-
-            createEffect(() => {
-                const askD = aksData();
-                if (askD) {
-                    // 这里的逻辑会在 data() 每次变化时执行
-                    let res: ResponseParser = new ResponseParser(askD);
-                    let text = res.getText();
-                    const inside = detectThink(text)
-                    if (isStart.test(text) || isEnd.test(text)) {
-                        text = ''
-                    }
-
-                    setMessagesArray(prev => [...prev, text]);
-                    if (inside) {
-                        setThinkMessages(str => str + text);
-                    } else {
-                        setAnswer(str => str + text);
-                        messagesStore.updateMessage(index, {type: 'answer', message: answer()})
-                    }
-                    setInside(inside)
-
-                    if (res.result.metadata.finishReason === 'stop') {
-                        askStop();
-                    }
+                    conversationStore.updateConversation({
+                        conversationId: conversationId(),
+                        problemSummary: data
+                    })
                 }
             });
-        })
+
+            setIsNewQuestion(false);
+        }
+
+        const index = messagesStore.messages.length
+
+        const detectThink = createThinkBlockDetector()
+
+        const {
+            stop: askStop
+        } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(), chatModelStore.model()), {
+            onMessage: (data) => {
+                // 这里的逻辑会在 data() 每次变化时执行
+                let res: ResponseParser = new ResponseParser(data);
+                let text = res.getText();
+                const inside = detectThink(text)
+                if (isStart.test(text) || isEnd.test(text) || text === null) {
+                    text = ''
+                }
+
+                setMessagesArray(prev => [...prev, text]);
+                if (inside) {
+                    setThinkMessages(str => str + text);
+                } else {
+                    setAnswer(str => str + text);
+                    messagesStore.updateMessage(index, {type: 'answer', message: answer()})
+                }
+                setInside(inside)
+
+                if (res.result.metadata.finishReason === 'stop') {
+                    askStop();
+                }
+            }
+        });
     }
 
     return {

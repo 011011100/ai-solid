@@ -1,7 +1,6 @@
 import {createStore} from 'solid-js/store';
 import type {ChatBubble} from "../type/chat-bubble.js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {createEffect, createRoot} from "solid-js";
 import chatMessage from "../type/chat-message.js";
 import ChatMessage from "../type/chat-message.js";
 import {getHistoryMessageApi} from "../api/default-chat-api.js";
@@ -12,27 +11,22 @@ function createMessagesStore() {
     const [messages, setMessages] = createStore<ChatBubble[]>([]);
 
     function getMessage(conversationId: string) {
-        const {data} = useEventSource<chatMessage>(getHistoryMessageApi(conversationId));
-        createRoot(() => {
-            createEffect(() => {
-                const d = data();
+        useEventSource<chatMessage>(getHistoryMessageApi(conversationId), {
+            onMessage: (d) => {
                 const isThink = /(<think>[\s\S]*<\/think>)/;
-                if (d) {
-                    let chatMessage = new ChatMessage(d);
-                    chatMessage.text = chatMessage.text.replace(isThink, '');
-                    switch (chatMessage.messageType) {
-                        case "USER":
-                            addMessage({type: 'ask', message: chatMessage.text});
-                            break;
-                        case "ASSISTANT":
-                            addMessage({type: 'answer', message: chatMessage.text});
-                            break;
-                        default:
-                            break;
-                    }
+                const chatMessage = new ChatMessage(d);
+                chatMessage.text = chatMessage.text.replace(isThink, '');
+
+                switch (chatMessage.messageType) {
+                    case "USER":
+                        addMessage({ type: "ask", message: chatMessage.text });
+                        break;
+                    case "ASSISTANT":
+                        addMessage({ type: "answer", message: chatMessage.text });
+                        break;
                 }
-            })
-        })
+            }
+        });
         return messages;
     }
 

@@ -1,18 +1,19 @@
 // src/utils/useEventSource.ts
 import {createRoot, createSignal, onCleanup} from "solid-js";
 
-interface UseEventSourceOptions {
-    connectTimeout?: number; // 毫秒，连接建立最大等待时间，-1 表示禁用
-    idleTimeout?: number;    // 毫秒，连接建立后最大静默时间，-1 表示禁用
+interface UseEventSourceOptions<T = any> {
+    connectTimeout?: number;   // 毫秒，连接建立最大等待时间，-1 表示禁用
+    idleTimeout?: number;      // 毫秒，连接建立后最大静默时间，-1 表示禁用
+    onMessage?: (data: T) => void; // ✅ 新增：接收到消息时触发的回调
 }
 
-export function useEventSource<T = any>(url: string, options?: UseEventSourceOptions) {
+export function useEventSource<T = any>(url: string, options?: UseEventSourceOptions<T>) {
     const [data, setData] = createSignal<T | null>(null);
     const [error, setError] = createSignal<Event | null>(null);
     const [isOpen, setIsOpen] = createSignal(false);
 
-    const connectTimeoutMs = options?.connectTimeout ?? 50000; // 默认连接超时 50s
-    const idleTimeoutMs = options?.idleTimeout ?? 10000; // 默认心跳超时 10s
+    const connectTimeoutMs = options?.connectTimeout ?? 50000;
+    const idleTimeoutMs = options?.idleTimeout ?? 10000;
 
     let lastUpdate = Date.now();
     let eventSource: EventSource | null = new EventSource(url);
@@ -39,11 +40,16 @@ export function useEventSource<T = any>(url: string, options?: UseEventSourceOpt
 
     eventSource.onmessage = (e) => {
         lastUpdate = Date.now();
+        let parsed;
+
         try {
-            setData(JSON.parse(e.data));
+            parsed = JSON.parse(e.data);
         } catch {
-            setData(e.data);
+            parsed = e.data;
         }
+        setData(parsed);
+        // ✅ 调用用户自定义的回调
+        options?.onMessage?.(parsed as T);
     };
 
     eventSource.onerror = (e) => {
@@ -74,7 +80,7 @@ export function useEventSource<T = any>(url: string, options?: UseEventSourceOpt
             if (heartbeat !== undefined) clearInterval(heartbeat);
             if (connectTimeout !== undefined) clearTimeout(connectTimeout);
         });
-    })
+    });
 
     const stop = () => {
         eventSource?.close();

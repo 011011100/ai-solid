@@ -1,29 +1,29 @@
 import {createEffect, createRoot, createSignal} from "solid-js";
 import {useEventSource} from "../utils/use-event-source.js";
-import {getAllOllamaChatModel} from "../api/ollama-api.js";
-import {type OllamaChatModelTag, OllamaChatModelTagsResponse} from "../type/ollama-chat-model-tag.js";
-// import {getAllDeepSeekChatModel} from "../api/deepseek-api.js";
-// import {DeepseekChatModelTag, type DeepseekChatModelTagsResponse} from "../type/deepseek-chat-model-tag.js";
+// import {getAllOllamaChatModel} from "../api/ollama-api.js";
+// import {type OllamaChatModelTag, OllamaChatModelTagsResponse} from "../type/ollama-chat-model-tag.js";
+import {getAllDeepSeekChatModel} from "../api/deepseek-api.js";
+import {DeepseekChatModelTag, type DeepseekChatModelTagsResponse} from "../type/deepseek-chat-model-tag.js";
 
 let store: ReturnType<typeof createChatModelStore>;
 
 function createChatModelStore() {
     const [modelNameList, setModelNameList] = createSignal<string[]>();
-    const [modelList, setModelList] = createSignal<OllamaChatModelTag[]>();
-    // const [modelList, setModelList] = createSignal<DeepseekChatModelTag[]>([]);
+    // const [modelList, setModelList] = createSignal<OllamaChatModelTag[]>();
+    const [modelList, setModelList] = createSignal<DeepseekChatModelTag[]>([]);
 
     function getAllModelName() {
         setModelNameList([]);
-        let {data} = useEventSource<OllamaChatModelTagsResponse>(getAllOllamaChatModel())
-        // let {data} = useEventSource<DeepseekChatModelTagsResponse>(getAllDeepSeekChatModel)
+        // let {data} = useEventSource<OllamaChatModelTagsResponse>(getAllOllamaChatModel())
+        let {data} = useEventSource<DeepseekChatModelTagsResponse>(getAllDeepSeekChatModel())
         createRoot(() => {
             createEffect(() => {
-                // let d = data()?.data;
-                let d = data()?.models;
+                let d = data()?.data;
+                // let d = data()?.models;
                 if (d) {
                     setModelList([...d]);
-                    // setModelNameList(d.map((item) => item.id));
-                    setModelNameList(d.map((item) => item.name));
+                    setModelNameList(d.map((item) => item.id));
+                    // setModelNameList(d.map((item) => item.name));
                 }
             })
         })

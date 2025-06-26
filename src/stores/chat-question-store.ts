@@ -92,7 +92,7 @@ function createChatQuestionStore() {
 
         const index = messagesStore.messages.length
 
-        const detectThink = createThinkBlockDetector()
+        // const detectThink = createThinkBlockDetector()
 
         const {
             stop: askStop
@@ -101,9 +101,13 @@ function createChatQuestionStore() {
                 // 这里的逻辑会在 data() 每次变化时执行
                 let res: ResponseParser = new ResponseParser(data);
                 let text = res.getText();
-                const inside = detectThink(text)
-                if (isStart.test(text) || isEnd.test(text) || text === null) {
-                    text = ''
+                // const inside = detectThink(text)
+                // if (isStart.test(text) || isEnd.test(text) || text === null) {
+                //     text = ''
+                // }
+                let inside = true
+                if (text !== null) {
+                    inside = false
                 }
 
                 setMessagesArray(prev => [...prev, text]);

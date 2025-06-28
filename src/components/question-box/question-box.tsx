@@ -47,8 +47,8 @@ const QuestionBox: Component = () => {
                         chatQuestionStore.inside() ?
                             <span class="loading loading-dots loading-sm"></span> :
                             !chatQuestionStore.question() ?
-                                <IconMdiLockQuestion/> :
-                                <IconMdiSend/>
+                                <IconLineMdHeartHalfFilled/> :
+                                <IconLineMdHeartFilled/>
                     }
                 </span>
             </div>

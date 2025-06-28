@@ -5,6 +5,7 @@ interface UseEventSourceOptions<T = any> {
     connectTimeout?: number;   // 毫秒，连接建立最大等待时间，-1 表示禁用
     idleTimeout?: number;      // 毫秒，连接建立后最大静默时间，-1 表示禁用
     onMessage?: (data: T) => void; // ✅ 新增：接收到消息时触发的回调
+    onError?: () => void; // ✅ 新增：错误时触发的回调
 }
 
 export function useEventSource<T = any>(url: string, options?: UseEventSourceOptions<T>) {
@@ -58,6 +59,8 @@ export function useEventSource<T = any>(url: string, options?: UseEventSourceOpt
         eventSource?.close();
         clearInterval(heartbeat);
         if (connectTimeout !== undefined) clearTimeout(connectTimeout);
+        // ✅ 调用用户自定义的回调
+        options?.onError?.();
     };
 
     if (idleTimeoutMs !== -1) {

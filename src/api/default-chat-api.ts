@@ -16,9 +16,19 @@ const createTitleApi = ((question: string, conversationId: string, modelName: st
     return `${BASE_URL}createTitle?question=${question}&conversationId=${conversationId}&modelName=${modelName}`;
 })
 
+const changeTitleApi = ((title: string, conversationId: string): string => {
+    return `${BASE_URL}changeTitle?title=${title}&conversationId=${conversationId}`;
+})
+
+const clearErrorDataApi = ((conversationId: string): string => {
+    return `${BASE_URL}clearErrorData?conversationId=${conversationId}`;
+})
+
 export {
     askQuestionApi,
     getHistoryMessageApi,
     getHistoryConversationApi,
     createTitleApi,
+    changeTitleApi,
+    clearErrorDataApi,
 }

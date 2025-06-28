@@ -5,7 +5,7 @@ import {useEventSource} from "../utils/use-event-source.js";
 import {useChatConversationStore} from "./chat-conversation-store.js";
 import {useChatModelStore} from "./chat-model-store.js";
 import {notify} from "../components/notification-context/global-notifier.js";
-import {askQuestionApi, createTitleApi} from "../api/default-chat-api.js";
+import {askQuestionApi, clearErrorDataApi, createTitleApi} from "../api/default-chat-api.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -20,24 +20,24 @@ function createChatQuestionStore() {
         setQuestion('');
     }
 
-    const isStart = /<think>/;
-    const isEnd = /<\/think>/;
+    // const isStart = /<think>/;
+    // const isEnd = /<\/think>/;
 
     // 是否思考
     const [inside, setInside] = createSignal<boolean>(false)
 
-    function createThinkBlockDetector() {
-        let insideBlock = false;
-
-        return function detectThinkBlock(chunk: string): boolean {
-
-            // 状态更新
-            if (isStart.test(chunk)) insideBlock = true;
-            if (isEnd.test(chunk)) insideBlock = false;
-
-            return insideBlock
-        };
-    }
+    // function createThinkBlockDetector() {
+    //     let insideBlock = false;
+    //
+    //     return function detectThinkBlock(chunk: string): boolean {
+    //
+    //         // 状态更新
+    //         if (isStart.test(chunk)) insideBlock = true;
+    //         if (isEnd.test(chunk)) insideBlock = false;
+    //
+    //         return insideBlock
+    //     };
+    // }
 
     // 消息列
     const [messagesArray, setMessagesArray] = createSignal<string[]>([]);
@@ -79,7 +79,6 @@ function createChatQuestionStore() {
                 connectTimeout: -1,
                 idleTimeout: -1,
                 onMessage: (data) => {
-
                     conversationStore.updateConversation({
                         conversationId: conversationId(),
                         problemSummary: data
@@ -97,6 +96,7 @@ function createChatQuestionStore() {
         const {
             stop: askStop
         } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(), chatModelStore.model()), {
+            connectTimeout: -1,
             onMessage: (data) => {
                 // 这里的逻辑会在 data() 每次变化时执行
                 let res: ResponseParser = new ResponseParser(data);
@@ -122,6 +122,9 @@ function createChatQuestionStore() {
                 if (res.result.metadata.finishReason === 'stop') {
                     askStop();
                 }
+            },
+            onError: () => {
+                useEventSource<ResponseParser>(clearErrorDataApi(conversationId()));
             }
         });
     }

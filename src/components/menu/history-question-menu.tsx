@@ -31,7 +31,7 @@ const historyQuestionMenu: Component = () => {
                         getHistoryMessage(data.conversationId)
                         chatStore.setConversationId(data.conversationId)
                     }}>
-                        <a>
+                        <a class='w-52 inline-block text-ellipsis overflow-hidden whitespace-nowrap' title={data.problemSummary}>
                             {data.problemSummary}
                         </a>
                     </li>

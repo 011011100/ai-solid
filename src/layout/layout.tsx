@@ -20,10 +20,11 @@ const layout: Component<LayoutProps> = (props: LayoutProps) => {
                     {/*<div class="card w-full rounded-box shadow-sm grow place-items-center flex overflow-auto h-[calc(100vh-80px)]">*/}
                     <div class='card w-full'>
                         <div
+                            // class='absolute top-0 w-full h-20 bg-transparent text-right p-3 flex items-start justify-between'>
                             class='absolute top-0 w-full h-20 bg-transparent text-right p-3 flex items-start justify-between'>
-                            <button>
-                                <IconMdiMenuOpen class='size-6'/>
-                            </button>
+                            {/*<button>*/}
+                            {/*    <IconMdiMenuOpen class='size-6'/>*/}
+                            {/*</button>*/}
                             <ChooseModel/>
                         </div>
                         <div

@@ -1,11 +1,11 @@
 import {type Component} from "solid-js";
 import HistoryQuestionMenu from "../components/menu/history-question-menu.js";
-import NewQuestionMenu from "../components/menu/new-question-menu.js";
+import FunctionMenu from "../components/menu/function-menu.js";
 
 const sidebar: Component = () => {
     return (
         <>
-            <NewQuestionMenu/>
+            <FunctionMenu/>
             <HistoryQuestionMenu/>
         </>
     )

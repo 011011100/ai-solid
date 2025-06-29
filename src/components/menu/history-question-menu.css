@@ -1,0 +1,7 @@
+.tooltip {
+    display: none;
+}
+
+.hover-container:hover .tooltip {
+    display: block;
+}

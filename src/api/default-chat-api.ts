@@ -1,7 +1,7 @@
 import {BASE_URL} from "../config/config.js";
 
-const askQuestionApi = ((question: string, conversationId: string, modelName: string): string => {
-    return `${BASE_URL}askQuestion?question=${question}&conversationId=${conversationId}&modelName=${modelName}`;
+const askQuestionApi = ((question: string, conversationId: string, modelName: string,onlineSearch?:string): string => {
+    return `${BASE_URL}askQuestion?question=${question}&conversationId=${conversationId}&modelName=${modelName}&onlineSearch=${onlineSearch}`;
 })
 
 const getHistoryMessageApi = ((conversationId: string): string => {
@@ -26,7 +26,10 @@ const deleteQuestionApi = ((conversationId: string): string => {
 
 const clearErrorDataApi = ((conversationId: string): string => {
     return `${BASE_URL}clearErrorData?conversationId=${conversationId}`;
+})
 
+const onlineSearchApi = ((question: string): string => {
+    return `${BASE_URL}onlineSearch?question=${question}`;
 })
 
 export {
@@ -37,4 +40,5 @@ export {
     changeTitleApi,
     deleteQuestionApi,
     clearErrorDataApi,
+    onlineSearchApi,
 }

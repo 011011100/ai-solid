@@ -5,12 +5,15 @@ import {useEventSource} from "../utils/use-event-source.js";
 import {useChatConversationStore} from "./chat-conversation-store.js";
 import {useChatModelStore} from "./chat-model-store.js";
 import {notify} from "../components/notification-context/global-notifier.js";
-import {askQuestionApi, clearErrorDataApi, createTitleApi} from "../api/default-chat-api.js";
+import {askQuestionApi, clearErrorDataApi, createTitleApi, onlineSearchApi} from "../api/default-chat-api.js";
+import type {NewsResponse} from "../type/online-response.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
 function createChatQuestionStore() {
     const [question, setQuestion] = createSignal<string>('');
+
+    const [isOnline, setOnline] = createSignal<boolean>(false);
 
     function addQuestion(item: string) {
         setQuestion(item);
@@ -52,22 +55,45 @@ function createChatQuestionStore() {
 
     const [isNewQuestion, setIsNewQuestion] = createSignal<boolean>(true);
 
-    function askQuestion() {
+    async function askQuestion() {
         const q = question()
 
         const chatModelStore = useChatModelStore()
         if (!chatModelStore.model()) {
             notify("请选择模型", "error")
-            return;
+            return
+        }
+        messagesStore.addMessage({type: 'ask', message: q})
+        setInside(true)
+
+        let onlineSearch
+        // ✅ 联网搜索封装成 Promise
+        if (isOnline()) {
+            await new Promise<void>((resolve, reject) => {
+                useEventSource<NewsResponse>(onlineSearchApi(q), {
+                    connectTimeout:-1,
+                    idleTimeout:-1,
+                    onMessage: (data) => {
+                        // 你可以在这里处理 data
+                        console.log("联网数据", data)
+                        onlineSearch = data.choices[0].message.content
+                        // ✅ 根据某种结束条件判断搜索已完成
+                        resolve()
+                    },
+                    onError: () => {
+                        console.error("查询失败")
+                        reject()
+                    }
+                })
+            })
         }
 
-        messagesStore.addMessage({type: 'ask', message: q})
+        // ✅ 等联网完成后再执行下方逻辑
 
         removeQuestion();
         setAnswer("");
         setThinkMessages("");
 
-        setInside(true)
         if (isNewQuestion()) {
             const conversationStore = useChatConversationStore()
             conversationStore.addConversation({
@@ -91,11 +117,10 @@ function createChatQuestionStore() {
 
         const index = messagesStore.messages.length
 
-        // const detectThink = createThinkBlockDetector()
-
+        console.log(onlineSearch)
         const {
             stop: askStop
-        } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(), chatModelStore.model()), {
+        } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(), chatModelStore.model(),onlineSearch), {
             connectTimeout: -1,
             onMessage: (data) => {
                 // 这里的逻辑会在 data() 每次变化时执行
@@ -129,6 +154,7 @@ function createChatQuestionStore() {
         });
     }
 
+
     return {
         question,
         addQuestion,
@@ -139,6 +165,8 @@ function createChatQuestionStore() {
         thinkMessages,
         answer,
         conversationId,
+        isOnline,
+        setOnline,
         setConversationId,
         setIsNewQuestion,
     }

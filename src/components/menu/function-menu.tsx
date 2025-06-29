@@ -22,10 +22,10 @@ const FunctionMenu: Component = () => {
                     <IconLineMdFileDocumentPlus class="w-4 h-4"/>
                     <p class='text-base'>新问题</p>
                 </a>
-                <a class='flex items-center'>
-                    <IconLineMdCogFilledLoop class="w-4 h-4"/>
-                    <p class='text-base'>记忆管理</p>
-                </a>
+                {/*<a class='flex items-center'>*/}
+                {/*    <IconLineMdCogFilledLoop class="w-4 h-4"/>*/}
+                {/*    <p class='text-base'>记忆管理</p>*/}
+                {/*</a>*/}
             </li>
         </ul>
     )

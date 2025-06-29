@@ -7,7 +7,7 @@ const Chat = () => {
     const chatStore = useChatQuestionStore();
     const messagesStorm = useMessagesStore();
     return (
-        <div class='w-100% min-w-4xl max-w-4xl max-h-[100%]'>
+        <div class='w-4xl max-h-[100%]'>
             {messagesStorm.messages.length == 0 && !chatStore.inside() ?
                 <div class='h-dvh flex justify-center items-center flex-col'>
                     <div>
@@ -34,7 +34,7 @@ const Chat = () => {
                             <></>
                         }
                     </div>
-                    <div class='fixed bottom-5 z-[99] left-[calc(50vw+88px)] transform -translate-x-1/2'>
+                    <div class='fixed bottom-10 z-[99] left-[calc(50vw+88px)] transform -translate-x-1/2'>
                         <QuestionBox/>
                     </div>
                 </>

@@ -11,8 +11,8 @@ const chooseModel: Component = () => {
 
     return (
         <div class="dropdown dropdown-start z-10">
-            {/*<p class="label mr-1">选择模型</p>*/}
-            <div tabIndex={0} role="button" class="m-1 text-lg ">
+            <p class="label ml-1">选择模型</p>
+            <div tabIndex={0} role="button" class="m-1 text-sm ">
                 <Show when={chatModelStore.model()} fallback={"选择模型"}>
                     {chatModelStore.model()}
                 </Show>

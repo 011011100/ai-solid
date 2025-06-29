@@ -20,8 +20,13 @@ const changeTitleApi = ((title: string, conversationId: string): string => {
     return `${BASE_URL}changeTitle?title=${title}&conversationId=${conversationId}`;
 })
 
+const deleteQuestionApi = ((conversationId: string): string => {
+    return `${BASE_URL}deleteQuestion?conversationId=${conversationId}`;
+})
+
 const clearErrorDataApi = ((conversationId: string): string => {
     return `${BASE_URL}clearErrorData?conversationId=${conversationId}`;
+
 })
 
 export {
@@ -30,5 +35,6 @@ export {
     getHistoryConversationApi,
     createTitleApi,
     changeTitleApi,
+    deleteQuestionApi,
     clearErrorDataApi,
 }

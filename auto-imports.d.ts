@@ -11,6 +11,7 @@ declare global {
   const IconLineMdFileUpload: typeof import('~icons/line-md/file-upload')['default']
   const IconLineMdHeartFilled: typeof import('~icons/line-md/heart-filled')['default']
   const IconLineMdHeartHalfFilled: typeof import('~icons/line-md/heart-half-filled')['default']
+  const IconLineMdLaptopTwotone: typeof import('~icons/line-md/laptop-twotone')['default']
   const IconLineMdLoadingAltLoop: typeof import('~icons/line-md/loading-alt-loop')['default']
   const IconMdiBlur: typeof import('~icons/mdi/blur')['default']
   const IconMdiDelete: typeof import('~icons/mdi/delete')['default']

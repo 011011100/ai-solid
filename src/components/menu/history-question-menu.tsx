@@ -74,7 +74,11 @@ const historyQuestionMenu: Component = () => {
     }
 
     function handleDelete(index: number) {
-        useEventSource(deleteQuestionApi(conversationStore().historyConversation()[index].conversationId))
+        useEventSource(deleteQuestionApi(conversationStore().historyConversation()[index].conversationId),{
+            onMessage: ()=>{
+                conversationStore().getAllConversation()
+            }
+        })
     }
 
     return (

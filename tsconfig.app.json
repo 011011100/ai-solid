@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
     "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "esModuleInterop": true,

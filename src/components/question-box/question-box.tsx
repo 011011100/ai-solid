@@ -45,7 +45,7 @@ const QuestionBox: Component = () => {
                 <span class="shadow-md p-1 badge badge-soft badge-lg rounded-lg m-1 border-[#bdbdbd]">
                     {
                         chatQuestionStore.inside() ?
-                            <span class="loading loading-dots loading-sm"></span> :
+                            <span class="loading loading-infinity loading-sm"></span> :
                             !chatQuestionStore.question() ?
                                 <IconLineMdHeartHalfFilled/> :
                                 <IconLineMdHeartFilled/>

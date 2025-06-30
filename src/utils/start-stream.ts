@@ -55,7 +55,7 @@ export function startStream(options: StreamFetcherOptions): () => void {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Accept: "application/stream+json"
+                    Accept: "application/x-ndjson"
                 },
                 body: body ? JSON.stringify(body) : undefined,
                 signal: controller.signal

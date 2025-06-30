@@ -4,6 +4,10 @@ const askQuestionApi = ((question: string, conversationId: string, modelName: st
     return `${BASE_URL}askQuestion?question=${question}&conversationId=${conversationId}&modelName=${modelName}&onlineSearch=${onlineSearch}`;
 })
 
+const askQuestionApi2 = ((): string => {
+    return `${BASE_URL}askQuestion`;
+})
+
 const getHistoryMessageApi = ((conversationId: string): string => {
     return `${BASE_URL}getHistoryMessage?conversationId=${conversationId}`;
 })
@@ -34,6 +38,7 @@ const onlineSearchApi = ((question: string): string => {
 
 export {
     askQuestionApi,
+    askQuestionApi2,
     getHistoryMessageApi,
     getHistoryConversationApi,
     createTitleApi,

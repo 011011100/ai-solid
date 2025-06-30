@@ -5,8 +5,13 @@ import {useEventSource} from "../utils/use-event-source.js";
 import {useChatConversationStore} from "./chat-conversation-store.js";
 import {useChatModelStore} from "./chat-model-store.js";
 import {notify} from "../components/notification-context/global-notifier.js";
-import {askQuestionApi, clearErrorDataApi, createTitleApi, onlineSearchApi} from "../api/default-chat-api.js";
+import {
+    askQuestionApi2,
+    createTitleApi,
+    onlineSearchApi
+} from "../api/default-chat-api.js";
 import type {NewsResponse} from "../type/online-response.js";
+import {startStream} from "../utils/start-stream.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -71,8 +76,8 @@ function createChatQuestionStore() {
         if (isOnline()) {
             await new Promise<void>((resolve, reject) => {
                 useEventSource<NewsResponse>(onlineSearchApi(q), {
-                    connectTimeout:-1,
-                    idleTimeout:-1,
+                    connectTimeout: -1,
+                    idleTimeout: -1,
                     onMessage: (data) => {
                         // 你可以在这里处理 data
                         console.log("联网数据", data)
@@ -117,13 +122,17 @@ function createChatQuestionStore() {
 
         const index = messagesStore.messages.length
 
-        console.log(onlineSearch)
-        const {
-            stop: askStop
-        } = useEventSource<ResponseParser>(askQuestionApi(q, conversationId(), chatModelStore.model(),onlineSearch), {
-            connectTimeout: -1,
-            onMessage: (data) => {
-                // 这里的逻辑会在 data() 每次变化时执行
+        const cleanup = startStream({
+            url: askQuestionApi2(),
+            body: {
+                question: q,
+                conversationId: conversationId(),
+                modelName: chatModelStore.model(),
+                onlineSearch: onlineSearch
+            },
+            heartbeatTimeout: -1,
+            connectionTimeout: -1,
+            onData: (data) => {
                 let res: ResponseParser = new ResponseParser(data);
                 let text = res.getText();
                 // const inside = detectThink(text)
@@ -145,11 +154,10 @@ function createChatQuestionStore() {
                 setInside(inside)
 
                 if (res.result.metadata.finishReason === 'stop') {
-                    askStop();
+                    cleanup();
                 }
             },
             onError: () => {
-                useEventSource<ResponseParser>(clearErrorDataApi(conversationId()));
             }
         });
     }

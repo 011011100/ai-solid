@@ -82,12 +82,12 @@ const historyQuestionMenu: Component = () => {
     }
 
     return (
-        <ul class="menu bg-base-200 rounded-box w-56">
+        <ul class="menu bg-base-200 rounded-box w-56 h-220 overflow-y-auto whitespace-nowrap list-none overflow-x-hidden block">
             <li class='menu-title'>聊天</li>
             <Show when={conversationStore().historyConversation().length > 0}
                   fallback={<li class='menu-title'>这里什么都没有哦</li>}>
                 {conversationStore().historyConversation().map((data: HistoryConversation, index) => {
-                    return <li class='text-base '>
+                    return <li class='text-base whitespace-nowrap'>
                         <div class='items-center flex flex-row flex-nowrap w-52 hover-container'>
                             <Show when={!canChange()[index]}
                                   fallback={<input use:autoFocus

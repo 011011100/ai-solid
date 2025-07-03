@@ -20,6 +20,7 @@
     "markdown-it-katex": "^2.0.3",
     "markdown-it-math": "^5.2.1",
     "solid-js": "^1.9.5",
+    "solid-transition-group": "^0.3.0",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {

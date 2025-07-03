@@ -26,7 +26,7 @@ const Chat = () => {
                         <QuestionBox/>
                     </div>
                 </div> :
-                <>
+                <div>
                     <div class='pb-40 pt-4'>
                         <HistoryChatBubble/>
                         {chatStore.inside() ?
@@ -37,7 +37,7 @@ const Chat = () => {
                     <div class='fixed bottom-10 z-[99] left-[calc(50vw+88px)] transform -translate-x-1/2'>
                         <QuestionBox/>
                     </div>
-                </>
+                </div>
             }
         </div>
     )

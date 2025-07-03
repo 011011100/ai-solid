@@ -2,7 +2,7 @@ import {type Component} from "solid-js";
 import HistoryQuestionMenu from "../components/menu/history-question-menu.tsx";
 import FunctionMenu from "../components/menu/function-menu.js";
 
-const sidebar: Component = () => {
+const Sidebar: Component = () => {
     return (
         <>
             <FunctionMenu/>
@@ -11,4 +11,4 @@ const sidebar: Component = () => {
     )
 }
 
-export default sidebar
+export default Sidebar

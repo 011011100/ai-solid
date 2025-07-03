@@ -48,14 +48,16 @@ const QuestionBox: Component = () => {
                     <IconLineMdLaptopTwotone class='w-5 h-5 p-0'/>
                     联网查询
                 </button>
-                <span class="shadow-md p-1 badge badge-soft badge-lg rounded-lg m-1 border-[#bdbdbd] hover:border-dashed">
-                    {
-                        chatQuestionStore.inside() ?
-                            <span class="loading loading-infinity loading-sm"></span> :
-                            !chatQuestionStore.question() ?
-                                <IconLineMdHeartHalfFilled/> :
-                                <IconLineMdHeartFilled onClick={handleAskQuestion}/>
-                    }
+
+                <span
+                    class="shadow-md p-1 badge badge-soft badge-lg rounded-lg m-1 border-[#bdbdbd] hover:border-dashed">
+                  {
+                      chatQuestionStore.inside() ?
+                          <span class="loading loading-infinity loading-sm"></span> :
+                          !chatQuestionStore.question() ?
+                              <IconLineMdHeartHalfFilled/> :
+                              <IconLineMdHeartFilled onClick={handleAskQuestion}/>
+                  }
                 </span>
             </div>
         </div>

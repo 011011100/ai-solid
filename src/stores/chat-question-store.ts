@@ -8,10 +8,9 @@ import {notify} from "../components/notification-context/global-notifier.js";
 import {
     askQuestionApi2,
     createTitleApi,
-    onlineSearchApi
 } from "../api/default-chat-api.js";
-import type {NewsResponse} from "../type/online-response.js";
 import {startStream} from "../utils/start-stream.js";
+import {useChatOnlineStore} from "./chat-online-store.js";
 
 let store: ReturnType<typeof createChatQuestionStore>;
 
@@ -60,6 +59,8 @@ function createChatQuestionStore() {
 
     const [isNewQuestion, setIsNewQuestion] = createSignal<boolean>(true);
 
+    const onlineSearchStore = useChatOnlineStore();
+
     async function askQuestion() {
         const q = question()
 
@@ -71,30 +72,7 @@ function createChatQuestionStore() {
         messagesStore.addMessage({type: 'ask', message: q})
         setInside(true)
 
-        let onlineSearch
-        // ✅ 联网搜索封装成 Promise
-        if (isOnline()) {
-            await new Promise<void>((resolve, reject) => {
-                useEventSource<NewsResponse>(onlineSearchApi(q), {
-                    connectTimeout: -1,
-                    idleTimeout: -1,
-                    onMessage: (data) => {
-                        // 你可以在这里处理 data
-                        console.log("联网数据", data)
-                        onlineSearch = data.choices[0].message.content
-                        // ✅ 根据某种结束条件判断搜索已完成
-                        resolve()
-                    },
-                    onError: () => {
-                        console.error("查询失败")
-                        reject()
-                    }
-                })
-            })
-        }
-
         // ✅ 等联网完成后再执行下方逻辑
-
         removeQuestion();
         setAnswer("");
         setThinkMessages("");
@@ -120,6 +98,11 @@ function createChatQuestionStore() {
             setIsNewQuestion(false);
         }
 
+        // ✅ 联网搜索封装成 Promise
+        if (isOnline()) {
+            await onlineSearchStore.doOnlineSearch(q)
+        }
+
         const index = messagesStore.messages.length
 
         const cleanup = startStream({
@@ -128,7 +111,7 @@ function createChatQuestionStore() {
                 question: q,
                 conversationId: conversationId(),
                 modelName: chatModelStore.model(),
-                onlineSearch: onlineSearch
+                onlineSearch: onlineSearchStore.onlineSearch()
             },
             heartbeatTimeout: -1,
             connectionTimeout: -1,

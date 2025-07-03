@@ -1,0 +1,12 @@
+
+/* slide-right 动画过渡 */
+.slide-right-enter-active,
+.slide-right-exit-active {
+    transition: all 0.3s ease-in-out;
+}
+
+.slide-right-enter-from,
+.slide-right-exit-to {
+    transform: translateX(100%);
+    opacity: 0;
+}

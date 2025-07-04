@@ -1,18 +1,21 @@
 import type {Component} from "solid-js";
 import {useMessagesStore} from "../../stores/chat-message-store.js";
 import {useChatQuestionStore} from "../../stores/chat-question-store.js";
+import {useChatOnlineStore} from "../../stores/chat-online-store.js";
 
 const FunctionMenu: Component = () => {
 
     const {removeAllMessage} = useMessagesStore()
 
     const chatStore = useChatQuestionStore()
+    const chatOnlineStore = useChatOnlineStore()
 
     function newQuestion() {
         removeAllMessage()
         const uuid = crypto.randomUUID().replace("-","");
         chatStore.setConversationId(uuid);
         chatStore.setIsNewQuestion(true);
+        chatOnlineStore.setOpenSidebar(false)
     }
 
     return (

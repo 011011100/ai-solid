@@ -11,12 +11,15 @@ import DropdownMenu, {type DropdownItem} from "./dropdown-menu.js";
 import {autoFocus} from "../../directives/auto-focus.js";
 import {useEventSource} from "../../utils/use-event-source.js";
 import {changeTitleApi, deleteQuestionApi} from "../../api/default-chat-api.js";
+import {useChatOnlineStore} from "../../stores/chat-online-store.js";
 
 const historyQuestionMenu: Component = () => {
 
     const conversationStore = useChatConversationStore;
     const {removeAllMessage, getMessage} = useMessagesStore()
     const chatStore = useChatQuestionStore()
+
+    const chatOnlineStore = useChatOnlineStore()
 
     const [canChange, setCanChange] = createSignal<boolean[]>([])
 
@@ -43,7 +46,7 @@ const historyQuestionMenu: Component = () => {
         conversationStore().getAllConversation();
         let can: boolean[] = []
         for (let i = 0; i < conversationStore().historyConversation().length; i++) {
-            can.push(...can, false)
+            can.push(false)
         }
         setCanChange(can)
     })
@@ -56,6 +59,7 @@ const historyQuestionMenu: Component = () => {
     }
 
     function getHistoryMessage(conversationId: string): void {
+        chatOnlineStore.setOpenSidebar(false)
         removeAllMessage()
         getMessage(conversationId);
         chatStore.setIsNewQuestion(false);

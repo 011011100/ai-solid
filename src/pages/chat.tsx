@@ -2,10 +2,12 @@ import QuestionBox from "../components/question-box/question-box.js";
 import {useChatQuestionStore} from "../stores/chat-question-store.js";
 import HistoryChatBubble from "../components/chat-bubble/history-chat-bubble.js";
 import {useMessagesStore} from "../stores/chat-message-store.js";
+import {useChatOnlineStore} from "../stores/chat-online-store.js";
 
 const Chat = () => {
     const chatStore = useChatQuestionStore();
     const messagesStorm = useMessagesStore();
+    const chatOnlineStore = useChatOnlineStore()
     return (
         <div class='w-4xl max-h-[100%]'>
             {messagesStorm.messages.length == 0 && !chatStore.inside() ?
@@ -34,7 +36,7 @@ const Chat = () => {
                             <></>
                         }
                     </div>
-                    <div class='fixed bottom-10 z-[99] left-[calc(50vw+88px)] transform -translate-x-1/2'>
+                    <div class={`fixed bottom-10 z-[99] ${chatOnlineStore.openSidebar()? 'left-[calc(50vw-20px)]' : 'left-[calc(50vw+110px)]'}  transform -translate-x-1/2`}>
                         <QuestionBox/>
                     </div>
                 </div>

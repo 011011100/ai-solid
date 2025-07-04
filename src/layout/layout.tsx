@@ -22,7 +22,7 @@ const layout: Component<LayoutProps> = (props: LayoutProps) => {
                         <Sidebar/>
                     </div>
                     {/*<div class="card w-full rounded-box shadow-sm grow place-items-center flex overflow-auto h-[calc(100vh-80px)]">*/}
-                    <div class={`relative ${chatOnlineStore.onlineSearch()? 'w-[calc(100vw-500px)]' : 'w-full'}`}>
+                    <div class={`relative ${chatOnlineStore.openSidebar()? 'w-[calc(100vw-500px)]' : 'w-full'}`}>
                         <div
                             class="absolute top-0 w-full h-20 bg-transparent text-left p-3 flex items-start justify-between">
                             <ChooseModel/>

@@ -11,8 +11,11 @@ function createChatOnlineStore() {
 
     const [webPageInfo,setWebPageInfo] = createSignal<Reference[]>()
 
+    const [openSidebar,setOpenSidebar] = createSignal<boolean>(false)
+
     function doOnlineSearch(q: string): Promise<any> {
         return new Promise<void>((resolve, reject) => {
+            clearInfo()
             useEventSource<NewsResponse>(onlineSearchApi(q), {
                 connectTimeout: -1,
                 idleTimeout: -1,
@@ -21,6 +24,7 @@ function createChatOnlineStore() {
                     console.log("联网数据", data)
                     setOnlineSearch(data.choices[0].message.content)
                     setWebPageInfo(data.references)
+                    setOpenSidebar(true)
                     // ✅ 根据某种结束条件判断搜索已完成
                     resolve()
                 },
@@ -33,11 +37,14 @@ function createChatOnlineStore() {
     }
 
     function clearInfo(){
+        setOpenSidebar(false)
         setWebPageInfo([])
     }
 
 
     return {
+        openSidebar,
+        setOpenSidebar,
         webPageInfo,
         onlineSearch,
         doOnlineSearch,

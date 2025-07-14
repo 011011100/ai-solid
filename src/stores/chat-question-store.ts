@@ -7,7 +7,7 @@ import {useChatModelStore} from "./chat-model-store.js";
 import {notify} from "../components/notification-context/global-notifier.js";
 import {
     askQuestionApi2,
-    createTitleApi,
+    createTitleApi, searchApi,
 } from "../api/default-chat-api.js";
 import {startStream} from "../utils/start-stream.js";
 import {useChatOnlineStore} from "./chat-online-store.js";
@@ -98,11 +98,28 @@ function createChatQuestionStore() {
             setIsNewQuestion(false);
         }
 
+        let onlineSearchResult = '';
         // ✅ 联网搜索封装成 Promise
         if (isOnline()) {
             await onlineSearchStore.doOnlineSearch(q)
+            await new Promise<void>((resolve, reject) => {
+                useEventSource<string>(searchApi(q), {
+                    connectTimeout: -1,
+                    idleTimeout: -1,
+                    onMessage: (data) => {
+                        console.log(data)
+                        onlineSearchResult = data
+                        resolve()
+                    },
+                    onError: () =>{
+                        console.error("查询失败")
+                        reject()
+                    }
+                });
+            });
         }
 
+        console.log(123)
         const index = messagesStore.messages.length
 
         const cleanup = startStream({
@@ -111,7 +128,8 @@ function createChatQuestionStore() {
                 question: q,
                 conversationId: conversationId(),
                 modelName: chatModelStore.model(),
-                onlineSearch: onlineSearchStore.onlineSearch()
+                onlineSearch: onlineSearchStore.onlineSearch(),
+                onlineSearchResult: onlineSearchResult
             },
             heartbeatTimeout: -1,
             connectionTimeout: -1,

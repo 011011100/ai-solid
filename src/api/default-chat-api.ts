@@ -36,6 +36,10 @@ const onlineSearchApi = ((question: string): string => {
     return `${BASE_URL}onlineSearch?question=${question}`;
 })
 
+const searchApi= ((question: string, engine?: string): string => {
+    return `${BASE_URL}search?query=${question}${engine ? `&engine=${engine}` : ''}`;
+})
+
 export {
     askQuestionApi,
     askQuestionApi2,
@@ -46,4 +50,5 @@ export {
     deleteQuestionApi,
     clearErrorDataApi,
     onlineSearchApi,
+    searchApi,
 }

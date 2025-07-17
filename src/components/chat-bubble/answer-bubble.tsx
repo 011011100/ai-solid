@@ -27,6 +27,31 @@ const md:MarkdownIt = markdownIt({
 
 addSafeInlineMath(md);
 
+// 添加自定义 link 样式
+const defaultLinkRender = md.renderer.rules.link_open || function (tokens, idx, options, _env, self) {
+    return self.renderToken(tokens, idx, options);
+};
+
+md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+
+    // 添加 class
+    const classIndex = token.attrIndex('class');
+    const customClasses = 'text-blue-600 hover:underline hover:text-blue-800 font-medium';
+
+    if (classIndex < 0) {
+        token.attrPush(['class', customClasses]);
+    } else {
+        token.attrs![classIndex][1] += ' ' + customClasses;
+    }
+
+    // 安全性增强：target="_blank" 和 rel="noopener noreferrer"
+    token.attrSet('target', '_blank');
+    token.attrSet('rel', 'noopener noreferrer');
+
+    return defaultLinkRender(tokens, idx, options, env, self);
+};
+
 type AnswerBubbleProps = {
     message: string;
 };

@@ -101,7 +101,7 @@ function createChatQuestionStore() {
         let onlineSearchResult = '';
         // ✅ 联网搜索封装成 Promise
         if (isOnline()) {
-            await onlineSearchStore.doOnlineSearch(q)
+            // await onlineSearchStore.doOnlineSearch(q)
             await new Promise<void>((resolve, reject) => {
                 useEventSource<string>(searchApi(q), {
                     connectTimeout: -1,
@@ -119,7 +119,6 @@ function createChatQuestionStore() {
             });
         }
 
-        console.log(123)
         const index = messagesStore.messages.length
 
         const cleanup = startStream({
@@ -129,7 +128,7 @@ function createChatQuestionStore() {
                 conversationId: conversationId(),
                 modelName: chatModelStore.model(),
                 onlineSearch: onlineSearchStore.onlineSearch(),
-                onlineSearchResult: onlineSearchResult
+                onlineSearchResult: onlineSearchResult || null
             },
             heartbeatTimeout: -1,
             connectionTimeout: -1,
